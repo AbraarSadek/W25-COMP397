@@ -7,7 +7,7 @@ namespace Platformer397 {
     [RequireComponent (typeof(Rigidbody))]
 
     //PlayerController Method
-    public class PlayerController : MonoBehaviour {
+    public class PlayerController : Subject {
 
         //Player Movement Variables - 1/15/25
         [SerializeField] private InputReader input;
@@ -35,6 +35,8 @@ namespace Platformer397 {
 
             //Debug.Log("[Start]");
             input.EnablePlayerActions();
+
+            NotifyObserbers();
 
         } //End of Start Method
 
