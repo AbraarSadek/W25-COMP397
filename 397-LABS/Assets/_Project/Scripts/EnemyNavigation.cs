@@ -17,7 +17,10 @@ namespace Platformer397 {
         private int index = 0;
         private Vector3 destination;
 
-
+        //Enemy Sensing Stats
+        [SerializeField] private LayerMask mask; //The layer that corresponds to the player
+        [SerializeField] private int viewDistance = 10; 
+        [SerializeField] private EnemyStates states = EnemyStates.Patrolling;
 
         //Awake Method
         private void Awake() {
@@ -57,16 +60,49 @@ namespace Platformer397 {
             //var destination = GameObject.FindWithTag("Player").transform.position;  
             //agent.destination = destination;
 
-            //If Statement - 
-            if (Vector3.Distance(destination, transform.position) < distanceThreshold) { 
-
-                index = (index + 1) % waypoints.Count; //Increment the index and assign it to the index variable
-                destination = waypoints[index].position; //Set the destination to the next waypoint in the waypoints list and assign it to the destination variable
-                agent.destination = destination; //Set the NavMeshAgent's destination to the destination
-
-            } //End of If Statement
-
+            switch (states) {
+            
+                case EnemyStates.Patrolling:
+                    //If Statement - To Make Enemy Patrol
+                    if (Vector3.Distance(destination, transform.position) < distanceThreshold) {
+                        index = (index + 1) % waypoints.Count; //Increment the index and assign it to the index variable
+                        destination = waypoints[index].position; //Set the destination to the next waypoint in the waypoints list and assign it to the destination variable
+                        
+                    } //End of If Statement
+                    break;
+                case EnemyStates.Chasing:
+                    //Start Chasing The Player While The Player Is Within The View Distance
+                    destination = player.gameObject.transform.position;
+                    break;
+                default:
+                    Debug.LogError("State not configured.", this);
+                    break;
+            
+            }
+            agent.destination = destination; //Set the NavMeshAgent's destination to the destination
         } //End of Update Method
+
+        //FixedUpdate Method
+        private void FixedUpdate() {
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, viewDistance, mask)) {
+
+                if (hit.transform.gameObject.CompareTag("Player"))
+                {
+                    states = EnemyStates.Chasing;
+                }
+                Debug.Log("Hit: " + hit.transform.gameObject.name);
+                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
+            } else {
+                states = EnemyStates.Patrolling;
+                Debug.Log("Did not hit anything");
+                Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * viewDistance, Color.yellow);
+
+            }
+
+        } //End of FixedUpdate Method
 
         //OnDrawGizmos Method
         private void OnDrawGizmos() {

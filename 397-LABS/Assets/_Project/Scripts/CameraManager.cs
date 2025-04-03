@@ -13,8 +13,8 @@ namespace Platformer397 {
         //Awake Method
         private void Awake() {
 
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            //Cursor.lockState = CursorLockMode.Locked;
+            //Cursor.visible = false;
             if (player != null) {return; }
             player = GameObject.FindGameObjectWithTag("Player").transform;
            
